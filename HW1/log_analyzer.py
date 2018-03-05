@@ -34,10 +34,7 @@ config = {
 # idea 2 for unittest: mtime файлика должен быть равен этому таймстемпу
 
 # create dictionary: url time_sum or value "statistics"?
-# create 
 
-# -actions: create github account
-# +code: regexp for file from ga
 LOG_NAMES_PATTERN = "^nginx-access-ui\.log\-(\d{8})(\.gz)?$"
 REPORT_NAMES_PATTERN = "^report\-\d{4}\.\d{2}\.\d{2}\.html$"
 YYYYMMDD_PATTERN = "(20\d{2})(1[0-2]|0[1-9])(3[01]|[0-2][1-9]|[12]0)"
@@ -48,11 +45,6 @@ LOGGING_FORMAT = '[%(asctime)s] %(levelname).1s %(message)s'
 # -code: logging library (look at logging.exception)
 # +code: work with configs
 # +code: print "the square of {} equals {}".format(args.square, answer)
-
-# </Anton>
-        if folder_name not in os.listdir(FILE_SAVE_PATH):
-            os.mkdir(FILE_SAVE_PATH+folder_name)
-       #/good example
 
 def get_config(path_to_config):
     """
