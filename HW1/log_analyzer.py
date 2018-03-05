@@ -149,10 +149,14 @@ def parse_line(line):
         is_parsed = 1
     return is_parsed, url, request_time
 
-def write_ts():
-    
-    
-    pass
+def write_ts(path):
+    """
+    Writes timestamp to file by presented path
+    """
+    ts_file = open(path, "w")
+    ts = time.time()
+    ts_file.write(str(ts))
+    ts_file.close()
 
 
 def main():
@@ -165,7 +169,7 @@ def main():
 
     # configure logger
     logging.basicConfig(level=logging.DEBUG, format=LOGGING_FORMAT, datefmt='%Y.%m.%d %H:%M:%S',
-                        filename=config_final.get("LOG_FILEPATH", None))
+                        filename=config_final.get("LOG_PATH", None))
     logger = logging.getLogger()
     try:
         if prepare_config_dirs(config_final):
@@ -250,7 +254,9 @@ def main():
                     report_file = open(config_final["REPORT_DIR"] + "/" + report_name, "w") # !! to add date
                     report_file.write(rep_template.substitute(table_json = str(table_json)))
                     report_file.close()
-
+                    
+                # Step 7: Write ts
+                write_ts(config_final["TS_PATH"])
 
         else:
             sys.exit()
