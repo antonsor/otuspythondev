@@ -21,7 +21,6 @@ config = {
     "REPORT_SIZE": 1000,
     "REPORT_DIR": "./reports",
     "LOG_DIR": "./log",
-    "WORK_DIR": "./work",
     "TS_PATH": "./ts/log_analyzer.ts",
     "ERRORS_PERCENT": 30,
     "LOG_PATH": None  #"log_analyzer.out"
@@ -40,10 +39,8 @@ REPORT_NAMES_PATTERN = "^report\-\d{4}\.\d{2}\.\d{2}\.html$"
 YYYYMMDD_PATTERN = "(20\d{2})(1[0-2]|0[1-9])(3[01]|[0-2][1-9]|[12]0)"
 LOGGING_FORMAT = '[%(asctime)s] %(levelname).1s %(message)s'
 
-# -code: insert into template
 # +code: process lines from notebook
 # -code: logging library (look at logging.exception)
-# +code: work with configs
 # +code: print "the square of {} equals {}".format(args.square, answer)
 
 def get_config(path_to_config):
@@ -186,10 +183,10 @@ def main():
                       }
             filter_dict = defaultdict(float)
 
-            log_name = get_file_to_parse()
-            if log_name:
+            log_file_name = get_file_to_parse()
+            if log_file_name:
                 print('Info: Start parsing file ', log_name)
-                if log_name.endswith(".gz"):
+                if log_file_name.endswith(".gz"):
                     log_to_parse = gzip.open(log_name, 'rb')
                 else:
                     log_to_parse = open(log_name, 'rb')
