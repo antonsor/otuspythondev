@@ -6,6 +6,7 @@ import configparser
 import re
 import logging
 import datetime
+import time
 import gzip
 from collections import defaultdict
 from string import Template
@@ -21,7 +22,7 @@ config = {
     "REPORT_DIR": "./reports",
     "LOG_DIR": "./log",
     "WORK_DIR": "./work",
-    "TS_DIR": "./ts",
+    "TS_PATH": "./ts/log_analyzer.ts",
     "ERRORS_PERCENT": 30,
     "LOG_FILEPATH": None  #"log_analyzer.out"
 }
@@ -157,6 +158,8 @@ def parse_line(line):
     return is_parsed, url, request_time
 
 def write_ts():
+    
+    
     pass
 
 
