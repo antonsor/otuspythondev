@@ -108,8 +108,7 @@ def get_file_to_parse(config_final):
     file_list.sort(reverse=True)
     if len(file_list) > 0:
         report_file = file_list[0]
-        print("Last report file found: ", report_file)
-        # write log: Info: Last report file found: , report_file
+        logging.info("Last report file found: " + report_file)
         
         # compare last log date and last report date
         last_log_date = datetime.datetime.strptime(log_file[20:28], "%Y%m%d")
@@ -117,8 +116,8 @@ def get_file_to_parse(config_final):
         if last_log_date > last_report_date:
             return log_file
         else:
-            print("No fresh log files found. Everything is up to date")
-            # write log: Info: No fresh log files found. Everything is up to date
+            logging.info("No fresh log files found. Everything is up to date")
+            
     else:
         return log_file
 
