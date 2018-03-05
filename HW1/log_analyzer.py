@@ -72,7 +72,7 @@ def get_config(path_to_config):
     
 
 def prepare_config_dirs(config_dict):
-    """"
+    """
     Creates folders needed for successful work of script.
     Paths are taken from config_dict parameters with "_DIR" suffixes.
     Avoids the problems with dirs that are not exist
@@ -238,7 +238,7 @@ def main():
                 final_urls = []
                 for entry in sorted(filter_dict, key=filter_dict.get, reverse=True):
                     entries_counter += 1
-                    if entries_counter <= int(config_final[REPORT_SIZE]):
+                    if entries_counter <= int(config_final["REPORT_SIZE"]):
                         final_urls.insert(len(final_urls), entry)
 
                 # Step 5: Form table_json
@@ -251,10 +251,9 @@ def main():
                 # Step 6: Form the report
                 with open('report.html', 'r') as rep_template_file:
                     rep_template = Template(rep_template_file.read())  #.replace('\n', '')
-                    report_file = open("ReportNN.txt", "w") # !! to add path and date
+                    report_file = open(config_final["REPORT_DIR"] + "/" + "ReportNN.txt", "w") # !! to add date
                     report_file.write(rep_template.substitute(table_json = str(table_json)))
                     report_file.close()
-
 
 
         else:
