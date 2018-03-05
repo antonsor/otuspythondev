@@ -35,7 +35,7 @@ config = {
 # create dictionary: url time_sum or value "statistics"?
 
 
-S_PATTERN = "^nginx-access-ui\.log\-(\d{8})(\.gz)?$"
+LOG_NAMES_PATTERN = "^nginx-access-ui\.log\-(\d{8})(\.gz)?$"
 REPORT_NAMES_PATTERN = "^report\-\d{4}\.\d{2}\.\d{2}\.html$"
 YYYYMMDD_PATTERN = "(20\d{2})(1[0-2]|0[1-9])(3[01]|[0-2][1-9]|[12]0)"
 LOGGING_FORMAT = '[%(asctime)s] %(levelname).1s %(message)s'
