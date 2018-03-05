@@ -34,7 +34,8 @@ config = {
 
 # create dictionary: url time_sum or value "statistics"?
 
-LOG_NAMES_PATTERN = "^nginx-access-ui\.log\-(\d{8})(\.gz)?$"
+
+S_PATTERN = "^nginx-access-ui\.log\-(\d{8})(\.gz)?$"
 REPORT_NAMES_PATTERN = "^report\-\d{4}\.\d{2}\.\d{2}\.html$"
 YYYYMMDD_PATTERN = "(20\d{2})(1[0-2]|0[1-9])(3[01]|[0-2][1-9]|[12]0)"
 LOGGING_FORMAT = '[%(asctime)s] %(levelname).1s %(message)s'
@@ -185,11 +186,11 @@ def main():
 
             log_file_name = get_file_to_parse()
             if log_file_name:
-                print('Info: Start parsing file ', log_name)
+                print('Info: Start parsing file ', log_file_name)
                 if log_file_name.endswith(".gz"):
-                    log_to_parse = gzip.open(log_name, 'rb')
+                    log_to_parse = gzip.open(log_file_name, 'rb')
                 else:
-                    log_to_parse = open(log_name, 'rb')
+                    log_to_parse = open(log_file_name, 'rb')
 
                 # Step 1: Parsing the file and filling the non-percentage values
                 for line in log_to_parse:
@@ -245,7 +246,7 @@ def main():
                     table_json.insert(len(table_json), table_json_entry)
 
                 # Step 6: Form the report
-                report_name = "report-"+log_name[20:24]+"."+log_name[24:26]+"."+log_name[26:28]+".html"
+                report_name = "report-"+log_file_name[20:24]+"."+log_file_name[24:26]+"."+log_file_name[26:28]+".html"
                 with open('report.html', 'r') as rep_template_file:
                     rep_template = Template(rep_template_file.read())  #.replace('\n', '')
                     report_file = open(config_final["REPORT_DIR"] + "/" + report_name, "w") # !! to add date
