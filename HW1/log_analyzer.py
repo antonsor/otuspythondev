@@ -27,12 +27,12 @@ config = {
     "LOG_PATH": None  #"log_analyzer.out"
 }
 
-
 # <Anton>
 # idea 1 for unittest: check that report exists and it consists of ... entries
 # idea 2 for unittest: mtime файлика должен быть равен этому таймстемпу
 # +code: process lines from notebook
 # +code: print "the square of {} equals {}".format(args.square, answer)
+# </Anton>
 
 # Useful constants
 LOG_NAMES_PATTERN = "^nginx-access-ui\.log\-(\d{8})(\.gz)?$"
@@ -269,7 +269,6 @@ def main():
 
     except Exception as e:
         logging.exception(e)
-
 
 if __name__ == "__main__":
     main()
