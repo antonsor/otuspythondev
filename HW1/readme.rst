@@ -15,3 +15,4 @@ LOG_PATH		- Path where result script log is placed
 
 Files required:
 report.html - report template
+logreader.ini - config file example
