@@ -249,9 +249,10 @@ def main():
                     table_json.insert(len(table_json), table_json_entry)
 
                 # Step 6: Form the report
+                report_name = "report-"+log_name[20:24]+"."+log_name[24:26]+"."+log_name[26:28]+".html"
                 with open('report.html', 'r') as rep_template_file:
                     rep_template = Template(rep_template_file.read())  #.replace('\n', '')
-                    report_file = open(config_final["REPORT_DIR"] + "/" + "ReportNN.txt", "w") # !! to add date
+                    report_file = open(config_final["REPORT_DIR"] + "/" + report_name, "w") # !! to add date
                     report_file.write(rep_template.substitute(table_json = str(table_json)))
                     report_file.close()
 
