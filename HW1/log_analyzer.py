@@ -31,16 +31,15 @@ config = {
 # <Anton>
 # idea 1 for unittest: check that report exists and it consists of ... entries
 # idea 2 for unittest: mtime файлика должен быть равен этому таймстемпу
+# +code: process lines from notebook
+# +code: print "the square of {} equals {}".format(args.square, answer)
 
-
+# Useful constants
 LOG_NAMES_PATTERN = "^nginx-access-ui\.log\-(\d{8})(\.gz)?$"
 REPORT_NAMES_PATTERN = "^report\-\d{4}\.\d{2}\.\d{2}\.html$"
 YYYYMMDD_PATTERN = "(20\d{2})(1[0-2]|0[1-9])(3[01]|[0-2][1-9]|[12]0)"
 LOGGING_FORMAT = '[%(asctime)s] %(levelname).1s %(message)s'
 
-# +code: process lines from notebook
-# -code: logging library (look at logging.exception)
-# +code: print "the square of {} equals {}".format(args.square, answer)
 
 def get_config(path_to_config):
     """
@@ -274,5 +273,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
- 
