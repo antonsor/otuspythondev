@@ -209,11 +209,11 @@ def main():
                         # taken from https://stackoverflow.com/questions/12636613/how-to-calculate-moving-average-without-keeping-the-count-and-data-total
                         calc_entry["time_avg"] = calc_entry["time_avg"] + (request_time - calc_entry["time_avg"])/calc_entry["count"]
                         calc_entry["time_max"] = request_time if request_time > calc_entry["time_max"] else calc_entry["time_max"]
-                        # temporarily runing median = running avg (looking for a formula
+                        # temporarily runing median = running avg (looking for a formula)
                         calc_entry["time_med"] = calc_entry["time_avg"]
                         calc_dict[url] = calc_entry
                     else:
-                        if total_lines_couter > 100 and (total_lines_couter - parsed_lines_counter)*100 / total_lines_couter > int(config_final["ERRORS_PERCENT"]):
+                        if total_lines_couter > 100 and (total_lines_couter - parsed_lines_counter) * 100 / total_lines_couter > int(config_final["ERRORS_PERCENT"]):
                             #logger.error('Too many parsing errors. Perhaps the log format has changed. Everything is stopped.')
                             logging.error('Too many parsing errors. Perhaps the log format has changed. Everything is stopped.')
                             sys.exit()
