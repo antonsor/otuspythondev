@@ -17,6 +17,7 @@ from string import Template
 #                     '"$http_user_agent" "$http_x_forwarded_for" "$http_X_REQUEST_ID" "$http_X_RB_USER" '
 #                     '$request_time';
 
+#default config
 config = {
     "REPORT_SIZE": 1000,
     "REPORT_DIR": "./reports",
@@ -27,12 +28,9 @@ config = {
 }
 
 
-
 # <Anton>
 # idea 1 for unittest: check that report exists and it consists of ... entries
 # idea 2 for unittest: mtime файлика должен быть равен этому таймстемпу
-
-# create dictionary: url time_sum or value "statistics"?
 
 
 LOG_NAMES_PATTERN = "^nginx-access-ui\.log\-(\d{8})(\.gz)?$"
@@ -54,7 +52,7 @@ def get_config(path_to_config):
         config_custom = config_custom['custom']
     except Exception as e:
         # write log: Exception: str(e)
-        print(str(e))
+        logging.error(str(e))
         sys.exit()
     result_config = config
     for parameter in result_config:
@@ -72,39 +70,37 @@ def prepare_config_dirs(config_dict):
         if parameter.endswith("_DIR"):
             parameter_dir = config_dict.get(parameter, None)
             if parameter_dir:
-                if not os.path.isdir(parameter_dir):   # ! to correct with config
+                if not os.path.isdir(parameter_dir):
                     try:
                         os.makedirs(parameter_dir)
                     except OSError:
-                        # write log: Unable to create dir parameter_dir
-                        print("Unable to create dir", parameter_dir)
+                        logging.error("Unable to create dir " + parameter_dir)
                         return False
     return True
 
 
-def get_file_to_parse():
+def get_file_to_parse(config_final):
     """
     Checks if there are fresh files to parse and
     returns log file name to parse
     """
     # get the log file with max date
     file_list = []
-    object_names = os.listdir() # ! to correct with path in config
+    object_names = os.listdir(config_final["LOG_DIR"]) # ! to correct with path in config
     for object_name in object_names:
         if re.fullmatch(LOG_NAMES_PATTERN, object_name):
             file_list.append(object_name)
     file_list.sort(reverse=True)
     if len(file_list) > 0:
         log_file = file_list[0]
-        print("Last log file found: ", log_file)
-        # write log: Info: Last log file found: , log_file
+        logging.info("Last log file found: " + log_file)
     else:
-        # write log: Info: No appropriate log files found
+        logging.info("No appropriate log files found")
         return False
     
     # get the report with max date
     file_list = []
-    report_dir = config.get("REPORT_DIR")  #! to correct with config
+    report_dir = config_final["REPORT_DIR"]
     object_names = os.listdir(report_dir)
     for object_name in object_names:
         if re.fullmatch(REPORT_NAMES_PATTERN, object_name):
