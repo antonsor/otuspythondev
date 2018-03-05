@@ -163,7 +163,7 @@ def main():
     # configure logger
     logging.basicConfig(level=logging.DEBUG, format=LOGGING_FORMAT, datefmt='%Y.%m.%d %H:%M:%S',
                         filename=config_final.get("LOG_PATH", None))
-    logger = logging.getLogger()
+    # logger = logging.getLogger()
     try:
         if prepare_config_dirs(config_final):
             parsed_lines_counter = 0
@@ -181,13 +181,15 @@ def main():
 
             log_file_name = get_file_to_parse()
             if log_file_name:
-                print('Info: Start parsing file ', log_file_name)
+                
+                logging.info('Start processing log file ' + log_file_name)
                 if log_file_name.endswith(".gz"):
                     log_to_parse = gzip.open(log_file_name, 'rb')
                 else:
                     log_to_parse = open(log_file_name, 'rb')
 
                 # Step 1: Parsing the file and filling the non-percentage values
+                logging.info("Step 1: Parsing the file and filling the non-percentage values")
                 for line in log_to_parse:
                     total_lines_couter += 1
                     is_parsed, url, request_time = parse_line(line)
@@ -214,6 +216,7 @@ def main():
                             sys.exit()
 
                 # Step 2: Get total values
+                logging.info("Step 2: Get total values")
                 time_sum_total = 0
                 count_total = 0
                 for key in calc_dict:
@@ -221,11 +224,13 @@ def main():
                     time_sum_total += calc_dict[key]["time_sum"]
 
                 # Step 3: Calculate percentage values
+                logging.info("Step 3: Calculate percentage values")
                 for key in calc_dict:
                     calc_dict[key]["count_perc"] = calc_dict[key]["count"]/count_total
                     calc_dict[key]["time_perc"] = calc_dict[key]["time_sum"]/time_sum_total
 
                 # Step 4: Form the list of REPORT_SIZE urls with max time_sum
+                logging.info("Step 4: Form the list of REPORT_SIZE urls with max time_sum")
                 entries_counter = 0
                 final_urls = []
                 for entry in sorted(filter_dict, key=filter_dict.get, reverse=True):
@@ -234,6 +239,7 @@ def main():
                         final_urls.insert(len(final_urls), entry)
 
                 # Step 5: Form table_json
+                logging.info("Step 5: Form table_json")
                 table_json = []
                 for entry in final_urls:
                     table_json_entry = calc_dict[entry]
@@ -241,6 +247,7 @@ def main():
                     table_json.insert(len(table_json), table_json_entry)
 
                 # Step 6: Form the report
+                logging.info("Step 6: Form the report")
                 report_name = "report-"+log_file_name[20:24]+"."+log_file_name[24:26]+"."+log_file_name[26:28]+".html"
                 with open('report.html', 'r') as rep_template_file:
                     rep_template = Template(rep_template_file.read())  #.replace('\n', '')
@@ -249,7 +256,14 @@ def main():
                     report_file.close()
                     
                 # Step 7: Write ts
+                logging.info("Step 7: Write ts")
                 write_ts(config_final["TS_PATH"])
+                
+                logging.info("Congratulations! Everything is OK")
+                logging.info("Processed log for date: " + report_name[7:17])
+                logging.info("Num records in log: " + total_lines_couter)
+                logging.info("Num records parced: " + parsed_lines_counter)
+                
 
         else:
             sys.exit()
