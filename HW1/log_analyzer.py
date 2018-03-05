@@ -24,7 +24,7 @@ config = {
     "WORK_DIR": "./work",
     "TS_PATH": "./ts/log_analyzer.ts",
     "ERRORS_PERCENT": 30,
-    "LOG_FILEPATH": None  #"log_analyzer.out"
+    "LOG_PATH": None  #"log_analyzer.out"
 }
 
 
