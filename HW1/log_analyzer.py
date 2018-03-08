@@ -12,7 +12,6 @@ import gzip
 from collections import defaultdict
 from string import Template
 
-
 # log_format ui_short '$remote_addr $remote_user $http_x_real_ip [$time_local] "$request" '
 #                     '$status $body_bytes_sent "$http_referer" '
 #                     '"$http_user_agent" "$http_x_forwarded_for" "$http_X_REQUEST_ID" "$http_X_RB_USER" '
@@ -134,12 +133,13 @@ def parse_line(line):
     request_time = 0.0
     try:
         line = line.split("GET ")[1]
-        url = line.split(" HTTP/1.1")[0]
+        url = line.split(" HTTP/1.")[0]
         request_time = float(line.split()[-1])
-    except Exception:
-        pass
-    finally:
         is_parsed = 1
+    except Exception:
+        is_parsed = 0
+    #finally:
+
     return is_parsed, url, request_time
 
 def write_ts(path):
@@ -179,27 +179,27 @@ def main():
                       }
             filter_dict = defaultdict(float)
 
-            log_file_name = get_file_to_parse()
+            log_file_name = get_file_to_parse(config_final)
             if log_file_name:
                 
                 logging.info('Start processing log file ' + log_file_name)
                 if log_file_name.endswith(".gz"):
-                    log_to_parse = gzip.open(log_file_name, 'rb')
+                    log_to_parse = gzip.open(os.path.join(config_final["LOG_DIR"], log_file_name), 'rb')
                 else:
-                    log_to_parse = open(log_file_name, 'rb')
+                    log_to_parse = open(os.path.join(config_final["LOG_DIR"], log_file_name), 'rb')
 
                 # Step 1: Parsing the file and filling the non-percentage values
                 logging.info("Step 1: Parsing the file and filling the non-percentage values")
                 for line in log_to_parse:
                     total_lines_couter += 1
-                    is_parsed, url, request_time = parse_line(line)
+                    is_parsed, url, request_time = parse_line(line.decode())
                     parsed_lines_counter += is_parsed
                     if is_parsed:
                         # modify filter_dict (key: url, value: time_sum)
                         time_sum = filter_dict.get(url,0) + request_time
                         filter_dict[url] = time_sum
                         # modify values dict (key: url, value: dict of column:value)
-                        calc_entry = calc_dict.get(url, calc_init)
+                        calc_entry = dict(calc_dict.get(url, calc_init))
                         calc_entry["count"] += 1
                         calc_entry["time_sum"] = time_sum
                         # calculate running avg by formula: average = old average + (next data - old average) / next count
@@ -217,8 +217,8 @@ def main():
 
                 # Step 2: Get total values
                 logging.info("Step 2: Get total values")
-                time_sum_total = 0
-                count_total = 0
+                time_sum_total = 0.0
+                count_total = 0.0
                 for key in calc_dict:
                     count_total += calc_dict[key]["count"]
                     time_sum_total += calc_dict[key]["time_sum"]
@@ -226,8 +226,10 @@ def main():
                 # Step 3: Calculate percentage values
                 logging.info("Step 3: Calculate percentage values")
                 for key in calc_dict:
-                    calc_dict[key]["count_perc"] = calc_dict[key]["count"]/count_total
-                    calc_dict[key]["time_perc"] = calc_dict[key]["time_sum"]/time_sum_total
+                    if count_total != 0:
+                        calc_dict[key]["count_perc"] = calc_dict[key]["count"]*100/count_total
+                    if time_sum_total != 0:
+                        calc_dict[key]["time_perc"] = calc_dict[key]["time_sum"]*100/time_sum_total
 
                 # Step 4: Form the list of REPORT_SIZE urls with max time_sum
                 logging.info("Step 4: Form the list of REPORT_SIZE urls with max time_sum")
@@ -252,7 +254,7 @@ def main():
                 with open('report.html', 'r') as rep_template_file:
                     rep_template = Template(rep_template_file.read())  #.replace('\n', '')
                     report_file = open(config_final["REPORT_DIR"] + "/" + report_name, "w") # !! to add date
-                    report_file.write(rep_template.substitute(table_json = str(table_json)))
+                    report_file.write(rep_template.safe_substitute(table_json = str(table_json)))
                     report_file.close()
                     
                 # Step 7: Write ts
@@ -261,8 +263,8 @@ def main():
                 
                 logging.info("Congratulations! Everything is OK")
                 logging.info("Processed log for date: " + report_name[7:17])
-                logging.info("Num records in log: " + total_lines_couter)
-                logging.info("Num records parced: " + parsed_lines_counter)
+                logging.info("Num records in log: " + str(total_lines_couter))
+                logging.info("Num records parced: " + str(parsed_lines_counter))
                 
 
         else:
