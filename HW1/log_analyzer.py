@@ -128,7 +128,8 @@ def parse_log(log_file_name, config_final):
     Step 1: Parsing the log file and filling the non-percentage values
     :return:
     """
-
+    parsed_lines_counter = 0
+    total_lines_counter = 0
     calc_dict = {}
     calc_init = {"count": 0,
                  "count_perc": 0,
@@ -173,10 +174,10 @@ def parse_log(log_file_name, config_final):
                 sys.exit()
     log_to_parse.close()
 
-    return calc_dict, filter_dict
+    return total_lines_counter, parsed_lines_counter, calc_dict, filter_dict
 
 
-def calc_stats(calc_dict, filter_dict):
+def calc_stats(calc_dict, filter_dict, config_final):
     """
     Step 2: Calculate statistics
     :return:
@@ -264,8 +265,6 @@ def main():
     # logger = logging.getLogger()
     try:
         if prepare_config_dirs(config_final):
-            parsed_lines_counter = 0
-            total_lines_counter = 0
 
             log_file_name = get_file_to_parse(config_final)
 
@@ -273,11 +272,11 @@ def main():
 
                 # Step 1: Parsing the file and filling the non-percentage values
                 logging.info("Step 1: Parsing the file and filling the non-percentage values")
-                calc_dict, filter_dict = parse_log(log_file_name, config_final)
+                total_lines_counter, parsed_lines_counter, calc_dict, filter_dict = parse_log(log_file_name, config_final)
 
                 # Step 2: Calculate statistics
                 logging.info("Step 2: Calculate statistics")
-                table_json = calc_stats(calc_dict, filter_dict)
+                table_json = calc_stats(calc_dict, filter_dict, config_final)
 
                 # Step 3: Form the report
                 logging.info("Step 3: Form the report")
@@ -305,3 +304,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
