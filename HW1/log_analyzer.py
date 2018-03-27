@@ -9,6 +9,7 @@ import logging
 import datetime
 import time
 import gzip
+import json
 from collections import defaultdict
 from string import Template
 
@@ -61,29 +62,27 @@ def get_config(path_to_config):
     return result_config
     
 
-def prepare_config_dirs(config_dict):
+def check_config_dirs(config_dict):
     """
-    Creates folders needed for successful work of script.
+    Checks existence of folders needed for successful work of script.
     Paths are taken from config_dict parameters with "_DIR" suffixes.
-    Avoids the problems with dirs that are not exist
+    return: negative result when it finds first directory that does not exist
     """
     for parameter in config_dict:
         if parameter.endswith("_DIR"):
             parameter_dir = config_dict.get(parameter, None)
             if parameter_dir:
                 if not os.path.isdir(parameter_dir):
-                    try:
-                        os.makedirs(parameter_dir)
-                    except OSError:
-                        logging.error("Unable to create dir " + parameter_dir)
-                        return False
+                    logging.error("Path '" + parameter_dir + "' taken from config parameter '" + parameter +
+                                  "' does not exist in file system. Please correct it and launch the script again")
+                    return False
     return True
 
 
 def get_file_to_parse(config_final):
     """
     Checks if there are fresh files to parse and
-    returns log file name to parse
+    :return: log file name to parse
     """
     # get the log file with max date
     file_list = []
@@ -218,10 +217,25 @@ def calc_stats(calc_dict, filter_dict, config_final):
     return table_json
 
 
+def write_report(log_file_name, table_json, config_final):
+    """
+    Step 3: Form the report
+    :return: Filename of report created
+    """
+    report_name = "report-" + log_file_name[20:24] + "." + log_file_name[24:26] + "." + log_file_name[26:28] + ".html"
+    with open('report.html', 'r') as rep_template_file:
+        rep_template = Template(rep_template_file.read())  # .replace('\n', '')
+        report_file = open(os.path.join(config_final["REPORT_DIR"], report_name), "w")  # !! to add date
+        #report_file.write(rep_template.safe_substitute(table_json=str(table_json)))
+        report_file.write(rep_template.safe_substitute(table_json=json.dumps(table_json)))
+        report_file.close()
+    return report_name
+
+
 def parse_line(line):
     """
     Implements parsing of a line
-    Returns overall result and parced fields:
+    :return: overall result and parced fields:
         is_parced       - 0 if parsing didn't cause any exceptions, 1 - otherwise
         url             - parsed field
         request_time    - parsed field
@@ -264,7 +278,7 @@ def main():
                         filename=config_final.get("LOG_PATH", None))
     # logger = logging.getLogger()
     try:
-        if prepare_config_dirs(config_final):
+        if check_config_dirs(config_final):
 
             log_file_name = get_file_to_parse(config_final)
 
@@ -280,14 +294,9 @@ def main():
 
                 # Step 3: Form the report
                 logging.info("Step 3: Form the report")
-                report_name = "report-"+log_file_name[20:24]+"."+log_file_name[24:26]+"."+log_file_name[26:28]+".html"
-                with open('report.html', 'r') as rep_template_file:
-                    rep_template = Template(rep_template_file.read())  #.replace('\n', '')
-                    report_file = open(os.path.join(config_final["REPORT_DIR"], report_name), "w") # !! to add date
-                    report_file.write(rep_template.safe_substitute(table_json = str(table_json)))
-                    report_file.close()
-                    
-                # Step 4: Write ts (perhaps, merge with previous)
+                report_name = write_report(log_file_name, table_json, config_final)
+
+                # Step 4: Write ts
                 logging.info("Step 4: Write ts")
                 write_ts(config_final["TS_PATH"])
                 
@@ -304,4 +313,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
